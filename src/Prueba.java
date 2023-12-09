@@ -21,9 +21,13 @@ public class Prueba {
     private JPanel principal;
     private JPanel panelConPelis;
     private JLabel peli1;
+    private JPanel panelPeli2;
+    private JPanel panelPeli3;
+    private JPanel panelPeli4;
     private JLabel peli4;
     private JLabel peli2;
     private JLabel peli3;
+    private JPanel panelPeli1;
 
     private int indiceActual = 0;
     private List<String> listaImagenes;
