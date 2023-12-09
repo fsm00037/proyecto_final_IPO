@@ -7,6 +7,8 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 public class Prueba {
     private JPanel panelCabecera2;
@@ -55,10 +57,18 @@ public class Prueba {
     private List<String> listaImagenes;
     private ArrayList<JPanel>panelesPelis;
     private ArrayList<JLabel>imagenes;
-
+    private ResourceBundle resourceBundle; // Variable para manejar los recursos
     // Constructor
     public Prueba() {
+
+
         panelesPelis = new ArrayList<>();
+        // Obtén el idioma actual del sistema (puedes cambiarlo según sea necesario)
+        String language ="es";
+
+        // Carga el archivo de propiedades correspondiente al idioma
+        resourceBundle = ResourceBundle.getBundle("idiomas.messages_" + language);
+
         panelesPelis.add(panelPeli1);
         panelesPelis.add(panelPeli2);
         panelesPelis.add(panelPeli3);
@@ -83,10 +93,12 @@ public class Prueba {
 
 
 
-        textRecomen.setText("Texto para Recomendaciones");
+
+        textRecomen.setText(resourceBundle.getString("textRecomen"));
         textRecomen.setForeground(Color.WHITE);
 
-        textCatalogo.setText("Texto para Catálogo");
+
+        textCatalogo.setText(resourceBundle.getString("textCatalogo"));
         textCatalogo.setForeground(Color.WHITE);
 
         botonUsuario.addActionListener(new ActionListener() {
@@ -121,11 +133,11 @@ public class Prueba {
         String[] opciones = {"Opción 1", "Opción 2", "Opción 3"};
         comboBox1.setModel(new DefaultComboBoxModel<>(opciones));
 
-        menu.add(new JButton("Accion1"));
-        menu.add(new JButton("Accion2"));
-        menu.add(new JButton("Accion3"));
-        menu.add(new JButton("Accion4"));
-        menu.add(new JButton("Accion5"));
+        menu.add(new JButton(resourceBundle.getString("opcionPeliculas")));
+        menu.add(new JButton(resourceBundle.getString("opcionBuscar")));
+        menu.add(new JButton(resourceBundle.getString("opcionCuenta")));
+        menu.add(new JButton(resourceBundle.getString("opcionAjustes")));
+        menu.add(new JButton(resourceBundle.getString("opcionAyuda")));
 
         // Obtener la lista de nombres de imágenes en la carpeta "imagenes"
         listaImagenes = obtenerNombresImagenes();
