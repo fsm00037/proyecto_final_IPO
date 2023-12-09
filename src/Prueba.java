@@ -2,6 +2,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,19 +23,66 @@ public class Prueba {
     private JPanel principal;
     private JPanel panelConPelis;
     private JLabel peli1;
-    private JPanel panelPeli2;
-    private JPanel panelPeli3;
-    private JPanel panelPeli4;
     private JLabel peli4;
     private JLabel peli2;
     private JLabel peli3;
     private JPanel panelPeli1;
+    private JLabel textoPeli2;
+    private JLabel textoPeli3;
+    private JLabel textoPeli4;
+    private JLabel textoPeli1;
+    private JLabel peli5;
+    private JLabel textoPeli5;
+
+    private JLabel peli6;
+    private JLabel textoPeli6;
+    private JLabel peli7;
+
+    private JLabel peli8;
+    private JLabel textoPeli8;
+    private JLabel peli9;
+    private JLabel textoPeli9;
+    private JPanel panelPeli2;
+    private JPanel panelPeli3;
+    private JPanel panelPeli4;
+    private JPanel panelPeli5;
+    private JPanel panelPeli6;
+    private JPanel panelPeli7;
+    private JPanel panelPeli8;
+    private JPanel panelPeli9;
 
     private int indiceActual = 0;
     private List<String> listaImagenes;
+    private ArrayList<JPanel>panelesPelis;
+    private ArrayList<JLabel>imagenes;
 
     // Constructor
     public Prueba() {
+        panelesPelis = new ArrayList<>();
+        panelesPelis.add(panelPeli1);
+        panelesPelis.add(panelPeli2);
+        panelesPelis.add(panelPeli3);
+        panelesPelis.add(panelPeli4);
+        panelesPelis.add(panelPeli5);
+        panelesPelis.add(panelPeli6);
+        panelesPelis.add(panelPeli7);
+        panelesPelis.add(panelPeli8);
+        panelesPelis.add(panelPeli9);
+
+        imagenes = new ArrayList<>();
+        imagenes.add(peli1);
+        imagenes.add(peli2);
+        imagenes.add(peli3);
+        imagenes.add(peli4);
+        imagenes.add(peli5);
+        imagenes.add(peli6);
+        imagenes.add(peli7);
+        imagenes.add(peli8);
+        imagenes.add(peli9);
+
+
+
+
         textRecomen.setText("Texto para Recomendaciones");
         textRecomen.setForeground(Color.WHITE);
 
@@ -86,6 +135,16 @@ public class Prueba {
         } else {
             JOptionPane.showMessageDialog(null, "No hay imágenes en la carpeta 'imagenes'.");
         }
+        for(JPanel panel : panelesPelis){
+            panel.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    super.mouseClicked(e);
+                    System.out.println("Abrir ventana peli"+panel.getX());
+                }
+            });
+        }
+
     }
 
     private List<String> obtenerNombresImagenes() {
@@ -125,15 +184,10 @@ public class Prueba {
             // Escalar la imagen al tamaño deseado
             ImageIcon imagenIcon = escalarImagen(rutaImagen, 200, 300);
             peli1.setIcon(imagenIcon);
-
-            int siguiente1 = (indiceActual + 1) % listaImagenes.size();
-            int siguiente2 = (indiceActual + 2) % listaImagenes.size();
-            int siguiente3 = (indiceActual + 3) % listaImagenes.size();
-
-            // Escalar y establecer el mismo tamaño para las otras imágenes
-            peli2.setIcon(escalarImagen("imagenes/" + listaImagenes.get(siguiente1), 200, 300));
-            peli3.setIcon(escalarImagen("imagenes/" + listaImagenes.get(siguiente2), 200, 300));
-            peli4.setIcon(escalarImagen("imagenes/" + listaImagenes.get(siguiente3), 200, 300));
+        for(int i =1;i< imagenes.size();i++){
+            int siguiente = (indiceActual++) % listaImagenes.size();
+            imagenes.get(i).setIcon(escalarImagen("imagenes/" + listaImagenes.get(siguiente), 200, 300));
+        }
 
         } catch (Exception e) {
             e.printStackTrace(); // Imprime la traza de la excepción
