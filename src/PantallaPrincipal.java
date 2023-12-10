@@ -5,12 +5,14 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.util.ArrayList;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.*;
 import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
 
-public class Prueba {
+public class PantallaPrincipal {
     private JPanel panelCabecera2;
     private JButton botonUsuario;
     private JPanel panelRecomendaciones;
@@ -58,17 +60,15 @@ public class Prueba {
     private ArrayList<JPanel>panelesPelis;
     private ArrayList<JLabel>imagenes;
     private ResourceBundle resourceBundle; // Variable para manejar los recursos
+    String language;
+    private ArrayList<JButton> botonesMenu;
     // Constructor
-    public Prueba() {
+    public PantallaPrincipal() {
 
+
+        language = "es";
 
         panelesPelis = new ArrayList<>();
-        // Obtén el idioma actual del sistema (puedes cambiarlo según sea necesario)
-        String language ="es";
-
-        // Carga el archivo de propiedades correspondiente al idioma
-        resourceBundle = ResourceBundle.getBundle("idiomas.messages_" + language);
-
         panelesPelis.add(panelPeli1);
         panelesPelis.add(panelPeli2);
         panelesPelis.add(panelPeli3);
@@ -90,21 +90,31 @@ public class Prueba {
         imagenes.add(peli8);
         imagenes.add(peli9);
 
+        menu.add(new JButton("Default"));
+        menu.add(new JButton("Default"));
+        menu.add(new JButton("Default"));
+        menu.add(new JButton("Default"));
+
+
+        botonesMenu = new ArrayList<>();
+        for (Component componente : menu.getComponents()) {
+            if (componente instanceof JButton) {
+                JButton boton = (JButton) componente;
+                // Ahora puedes acceder y modificar el botón
+                botonesMenu.add(boton);
+            }
+        }
 
 
 
 
-        textRecomen.setText(resourceBundle.getString("textRecomen"));
-        textRecomen.setForeground(Color.WHITE);
 
-
-        textCatalogo.setText(resourceBundle.getString("textCatalogo"));
-        textCatalogo.setForeground(Color.WHITE);
 
         botonUsuario.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(null, "¡Haz clic en el botón de usuario!");
+                ConfiguracionMenu configuracionMenu = new ConfiguracionMenu(PantallaPrincipal.this);
+                configuracionMenu.setVisible(true);
             }
         });
 
@@ -133,11 +143,7 @@ public class Prueba {
         String[] opciones = {"Opción 1", "Opción 2", "Opción 3"};
         comboBox1.setModel(new DefaultComboBoxModel<>(opciones));
 
-        menu.add(new JButton(resourceBundle.getString("opcionPeliculas")));
-        menu.add(new JButton(resourceBundle.getString("opcionBuscar")));
-        menu.add(new JButton(resourceBundle.getString("opcionCuenta")));
-        menu.add(new JButton(resourceBundle.getString("opcionAjustes")));
-        menu.add(new JButton(resourceBundle.getString("opcionAyuda")));
+
 
         // Obtener la lista de nombres de imágenes en la carpeta "imagenes"
         listaImagenes = obtenerNombresImagenes();
@@ -156,6 +162,19 @@ public class Prueba {
                 }
             });
         }
+        cambiarIdioma(language);
+
+    }
+    public void refrescarIU(){
+
+        textRecomen.setText(resourceBundle.getString("textRecomen"));
+        textRecomen.setForeground(Color.WHITE);
+
+        textCatalogo.setText(resourceBundle.getString("textCatalogo"));
+        textCatalogo.setForeground(Color.WHITE);
+
+
+
 
     }
 
@@ -207,12 +226,45 @@ public class Prueba {
         }
     }
 
+
+    public void cambiarIdioma(String idioma) {
+        language = idioma;
+        String userDir = System.getProperty("user.dir");
+        String path = userDir + "/idiomas/messages_" + language + ".properties";
+
+        Properties properties = new Properties();
+        try (InputStream input = new FileInputStream(path)) {
+            properties.load(input);
+
+            textRecomen.setText(properties.getProperty("textRecomen"));
+            textRecomen.setForeground(Color.WHITE);
+
+            textCatalogo.setText(properties.getProperty("textCatalogo"));
+            textCatalogo.setForeground(Color.WHITE);
+
+            botonesMenu.get(0).setText(properties.getProperty("opcionBuscar"));
+            botonesMenu.get(1).setText(properties.getProperty("opcionCuenta"));
+            botonesMenu.get(2).setText(properties.getProperty("opcionAjustes"));
+            botonesMenu.get(3).setText(properties.getProperty("opcionAyuda"));
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Error cargando el archivo de propiedades: " + e.getMessage());
+        }
+    }
+
+
     public static void main(String[] args) {
+
+
+
+
         JFrame frame = new JFrame("Prueba");
         frame.setSize(1030, 770);
-        frame.setContentPane(new Prueba().principal);
+        PantallaPrincipal pantallaPrincipal = new PantallaPrincipal();
+        frame.setContentPane(pantallaPrincipal.principal);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
+
     }
 }
 
