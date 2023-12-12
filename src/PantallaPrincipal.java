@@ -4,13 +4,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URL;
 import java.util.*;
 import java.util.List;
+
+
+
 
 public class PantallaPrincipal {
     private JPanel panelCabecera2;
@@ -23,7 +23,6 @@ public class PantallaPrincipal {
     private JButton botonIzquierda;
     private JTextField textField1;
     private JComboBox<String> comboBox1;
-    private JToolBar menu;
     private JPanel principal;
     private JPanel panelConPelis;
     private JLabel peli1;
@@ -54,6 +53,9 @@ public class PantallaPrincipal {
     private JPanel panelPeli7;
     private JPanel panelPeli8;
     private JPanel panelPeli9;
+    private JMenuBar menuBar1;
+    private JLabel logo;
+    private JMenuBar menu;
 
     private int indiceActual = 0;
     private List<String> listaImagenes;
@@ -61,13 +63,37 @@ public class PantallaPrincipal {
     private ArrayList<JLabel>imagenes;
     private ResourceBundle resourceBundle; // Variable para manejar los recursos
     String language;
-    private ArrayList<JButton> botonesMenu;
+    private ArrayList<JMenuItem> botonesMenu;
+    JMenuBar menuBar;
+    Properties properties ;
+    ConfiguracionMenu configuracionMenu;
+    PantallaInformacion pantallaInformacion;
+    JMenu menuPeliculas;
+    JMenu menuBuscar;
+    JMenu menuCuenta;
+    JMenu menuAjustes;
+    JMenu menuAyuda;
     // Constructor
-    public PantallaPrincipal() {
+    public PantallaPrincipal() throws IOException {
 
-
+        menu = new JMenuBar();
         language = "es";
 
+        String userDir = System.getProperty("user.dir");
+        String path = userDir + "/idiomas/messages_" + language + ".properties";
+
+        properties = new Properties();
+        properties.load(new FileInputStream(path));
+        CrearUI();
+        eventos();
+        cargarPeliculas();
+
+        configuracionMenu = new ConfiguracionMenu(PantallaPrincipal.this);
+        pantallaInformacion = new PantallaInformacion(PantallaPrincipal.this);
+        cambiarIdioma(language);
+
+    }
+    private void CrearUI(){
         panelesPelis = new ArrayList<>();
         panelesPelis.add(panelPeli1);
         panelesPelis.add(panelPeli2);
@@ -90,32 +116,58 @@ public class PantallaPrincipal {
         imagenes.add(peli8);
         imagenes.add(peli9);
 
-        menu.add(new JButton("Default"));
-        menu.add(new JButton("Default"));
-        menu.add(new JButton("Default"));
-        menu.add(new JButton("Default"));
+        // Crear la barra de menú
+        menuBar = new JMenuBar();
 
+        // Crear el menú
+        menuPeliculas = new JMenu();
+        menuBuscar = new JMenu();
+        menuCuenta = new JMenu();
+        menuAjustes = new JMenu();
+        menuAyuda = new JMenu();
 
-        botonesMenu = new ArrayList<>();
-        for (Component componente : menu.getComponents()) {
-            if (componente instanceof JButton) {
-                JButton boton = (JButton) componente;
-                // Ahora puedes acceder y modificar el botón
-                botonesMenu.add(boton);
-            }
+        // Agregar los elementos al menú
+        menuPeliculas.add(new JMenuItem());
+        menuPeliculas.add(new JMenuItem());
+        menuBuscar.add(new JMenuItem());
+        menuCuenta.add(new JMenuItem());
+        menuAjustes.add(new JMenuItem());
+        menuAyuda.add(new JMenuItem());
+
+        // Agregar el menú a la barra de menú
+        menuBar1.add(menuPeliculas);
+        menuBar1.add(menuBuscar);
+        menuBar1.add(menuCuenta);
+        menuBar1.add(menuAjustes);
+        menuBar1.add(menuAyuda);
+
+        ImageIcon imagenIcon = escalarImagen("imagenes/logo.png", 60, 60);
+        logo.setIcon(imagenIcon);
+
+    }
+
+    private void eventos(){
+
+        //pulsar en caratula
+        for(JPanel panel : panelesPelis){
+            panel.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    super.mouseClicked(e);
+                    pantallaInformacion.setVisible(true);
+                    pantallaInformacion.refreshUI();
+                    System.out.println("Abrir ventana peli"+panel.getX());
+                }
+            });
         }
-
-
-
-
-
-
-        botonUsuario.addActionListener(new ActionListener() {
+        JMenuItem aux=(JMenuItem)    menuAjustes.getMenuComponent(0);
+        aux.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                ConfiguracionMenu configuracionMenu = new ConfiguracionMenu(PantallaPrincipal.this);
                 configuracionMenu.setVisible(true);
+                configuracionMenu.initUI();
             }
+
         });
 
         botonDerecha.addActionListener(new ActionListener() {
@@ -137,46 +189,16 @@ public class PantallaPrincipal {
                 }
             }
         });
-
-        textField1.setText("Texto para el JTextField");
-
-        String[] opciones = {"Opción 1", "Opción 2", "Opción 3"};
-        comboBox1.setModel(new DefaultComboBoxModel<>(opciones));
-
-
-
-        // Obtener la lista de nombres de imágenes en la carpeta "imagenes"
-        listaImagenes = obtenerNombresImagenes();
-
-        if (!listaImagenes.isEmpty()) {
-            mostrarImagen();
-        } else {
-            JOptionPane.showMessageDialog(null, "No hay imágenes en la carpeta 'imagenes'.");
-        }
-        for(JPanel panel : panelesPelis){
-            panel.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    super.mouseClicked(e);
-                    System.out.println("Abrir ventana peli"+panel.getX());
-                }
-            });
-        }
-        cambiarIdioma(language);
-
     }
-    public void refrescarIU(){
-
-        textRecomen.setText(resourceBundle.getString("textRecomen"));
-        textRecomen.setForeground(Color.WHITE);
-
-        textCatalogo.setText(resourceBundle.getString("textCatalogo"));
-        textCatalogo.setForeground(Color.WHITE);
-
-
-
-
-    }
+   private void cargarPeliculas(){
+       // Obtener la lista de nombres de imágenes en la carpeta "imagenes"
+       listaImagenes = obtenerNombresImagenes();
+       if (!listaImagenes.isEmpty()) {
+           mostrarImagen();
+       } else {
+           JOptionPane.showMessageDialog(null, "No hay imágenes en la carpeta 'imagenes'.");
+       }
+   }
 
     private List<String> obtenerNombresImagenes() {
         System.out.println("upps");
@@ -232,7 +254,7 @@ public class PantallaPrincipal {
         String userDir = System.getProperty("user.dir");
         String path = userDir + "/idiomas/messages_" + language + ".properties";
 
-        Properties properties = new Properties();
+        properties = new Properties();
         try (InputStream input = new FileInputStream(path)) {
             properties.load(input);
 
@@ -242,29 +264,60 @@ public class PantallaPrincipal {
             textCatalogo.setText(properties.getProperty("textCatalogo"));
             textCatalogo.setForeground(Color.WHITE);
 
-            botonesMenu.get(0).setText(properties.getProperty("opcionBuscar"));
-            botonesMenu.get(1).setText(properties.getProperty("opcionCuenta"));
-            botonesMenu.get(2).setText(properties.getProperty("opcionAjustes"));
-            botonesMenu.get(3).setText(properties.getProperty("opcionAyuda"));
+            JMenuItem aux;
+
+            menuPeliculas.setText(properties.getProperty("opcionPeliculas"));
+            aux=(JMenuItem)    menuPeliculas.getMenuComponent(0);
+            aux.setText(properties.getProperty("comprar"));
+            aux=(JMenuItem)    menuPeliculas.getMenuComponent(1);
+            aux.setText(properties.getProperty("trailers"));
+
+            menuBuscar.setText(properties.getProperty("opcionBuscar"));
+            aux=(JMenuItem)    menuBuscar.getMenuComponent(0);
+            aux.setText(properties.getProperty("comprar"));
+
+            menuCuenta.setText(properties.getProperty("opcionCuenta"));
+            aux=(JMenuItem)    menuCuenta.getMenuComponent(0);
+            aux.setText(properties.getProperty("cerrarCuenta"));
+
+            menuAjustes.setText(properties.getProperty("opcionAjustes"));
+            aux=(JMenuItem)    menuAjustes.getMenuComponent(0);
+            aux.setText(properties.getProperty("ventanaIdioma"));
+
+            menuAyuda.setText(properties.getProperty("opcionAyuda"));
+            aux=(JMenuItem)    menuAyuda.getMenuComponent(0);
+            aux.setText(properties.getProperty("guia"));
+
+            pantallaInformacion.setVisible(false);
+
+
         } catch (IOException e) {
             e.printStackTrace();
             System.err.println("Error cargando el archivo de propiedades: " + e.getMessage());
         }
+
+
     }
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 
 
 
 
-        JFrame frame = new JFrame("Prueba");
+        JFrame frame = new JFrame("FFilms");
         frame.setSize(1030, 770);
         PantallaPrincipal pantallaPrincipal = new PantallaPrincipal();
         frame.setContentPane(pantallaPrincipal.principal);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
 
+
+
+    }
+
+    public Properties getProperties() {
+        return properties;
     }
 }
 

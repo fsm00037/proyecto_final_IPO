@@ -1,8 +1,10 @@
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.Vector;
 
@@ -19,10 +21,11 @@ public class ConfiguracionMenu extends JFrame {
 
     }
 
-    private void initUI() {
+    public void initUI() {
         // Configuración de la ventana principal
-        setTitle("Configuración de Idioma");
-        setSize(300, 200);
+        Properties properties = pantalla.getProperties();
+        setTitle(properties.getProperty("ventanaIdioma"));
+        setSize(300, 100);
         setLocationRelativeTo(null);
 
         // Crear el ComboBox para seleccionar el idioma
@@ -37,6 +40,7 @@ public class ConfiguracionMenu extends JFrame {
                 for (File archivo : archivos) {
                     System.out.println(archivo.getName().replaceAll(".*_(.*?)\\.properties", "$1"));
                     idiomasDisponibles.add(archivo.getName().replaceAll(".*_(.*?)\\.properties", "$1"));
+
                 }
             } else {
                 System.out.println("La carpeta está vacía o no se puede acceder.");
@@ -49,17 +53,17 @@ public class ConfiguracionMenu extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 pantalla.cambiarIdioma(idiomasDisponibles.get(idiomaComboBox.getSelectedIndex()));
-
             }
         });
 
         // Crear el panel principal
         JPanel panel = new JPanel();
-        panel.add(new JLabel("Selecciona Idioma:"));
-        panel.add(idiomaComboBox);
+        panel.add(new JLabel("Selecciona Idioma:"), BorderLayout.CENTER);
+        panel.add(idiomaComboBox, BorderLayout.CENTER);
 
         // Añadir el panel a la ventana
         add(panel);
+
 
     }
 
