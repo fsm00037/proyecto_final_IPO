@@ -1,5 +1,6 @@
 public class Actor {
     int cod;
+
     String nombre;
     String img;
 

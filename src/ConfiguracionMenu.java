@@ -13,24 +13,25 @@ public class ConfiguracionMenu extends JFrame {
     private JComboBox<String> idiomaComboBox;
     private ResourceBundle resourceBundle;
     PantallaPrincipal pantalla;
+    JButton aceptarBoton;
+    ArrayList<String> idiomasDisponibles;
+    JLabel textoIdioma;
 
     public ConfiguracionMenu(PantallaPrincipal pantalla) {
         this.pantalla = pantalla;
+        cargarIdiomas();
+
+
+        idiomaComboBox = new JComboBox<>(new Vector<>(idiomasDisponibles));
+        this.setResizable(false);
         initUI();
 
 
+
     }
-
-    public void initUI() {
-        // Configuración de la ventana principal
-        Properties properties = pantalla.getProperties();
-        setTitle(properties.getProperty("ventanaIdioma"));
-        setSize(300, 100);
-        setLocationRelativeTo(null);
-
-        // Crear el ComboBox para seleccionar el idioma
+    public void cargarIdiomas(){
         File carpetaIdiomas = new File("idiomas");
-        ArrayList<String> idiomasDisponibles = new ArrayList<>();
+       idiomasDisponibles = new ArrayList<>();
         if (carpetaIdiomas.isDirectory()) {
             // Obtener la lista de archivos en la carpeta
             File[] archivos = carpetaIdiomas.listFiles();
@@ -45,22 +46,37 @@ public class ConfiguracionMenu extends JFrame {
             } else {
                 System.out.println("La carpeta está vacía o no se puede acceder.");
             }
-
-            idiomaComboBox = new JComboBox<>(new Vector<>(idiomasDisponibles));
         }
+    }
+    private void translate(){
+        Properties properties = pantalla.getProperties();
+        setTitle(properties.getProperty("ventanaIdioma"));
+        textoIdioma.setText(properties.getProperty("seleccionaIdioma"));
+        aceptarBoton.setText(properties.getProperty("aceptar"));
+    }
 
-        idiomaComboBox.addActionListener(new ActionListener() {
+    public void initUI() {
+        // Configuración de la ventana principal
+        Properties properties = pantalla.getProperties();
+        setTitle(properties.getProperty("ventanaIdioma"));
+        setSize(300, 100);
+        setLocationRelativeTo(null);
+        aceptarBoton=new JButton(properties.getProperty("aceptar"));
+
+        aceptarBoton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 pantalla.cambiarIdioma(idiomasDisponibles.get(idiomaComboBox.getSelectedIndex()));
+                translate();
             }
         });
-
         // Crear el panel principal
         JPanel panel = new JPanel();
-        panel.add(new JLabel("Selecciona Idioma:"), BorderLayout.CENTER);
-        panel.add(idiomaComboBox, BorderLayout.CENTER);
 
+        textoIdioma =new  JLabel(properties.getProperty("seleccionaIdioma"));
+        panel.add(textoIdioma, BorderLayout.CENTER);
+        panel.add(idiomaComboBox, BorderLayout.CENTER);
+        panel.add(aceptarBoton,BorderLayout.SOUTH);
         // Añadir el panel a la ventana
         add(panel);
 
@@ -71,12 +87,5 @@ public class ConfiguracionMenu extends JFrame {
 
 
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-              //  new ConfiguracionMenu().setVisible(true);
-            }
-        });
-    }
+
 }

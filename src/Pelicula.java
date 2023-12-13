@@ -12,7 +12,7 @@ public class Pelicula {
     private Actor director;
     private ArrayList<Actor> actores;
 
-    public Pelicula(int cod, String titulo, String sinopsis, int anio, int duracion, String pais, String genero, String imagen, Actor director) {
+    public Pelicula(int cod, String titulo, String sinopsis, int anio, int duracion, String pais, String genero, String imagen, Actor director, ArrayList<Actor> actores) {
         this.actores = new ArrayList<>();
         this.cod = cod;
         this.titulo = titulo;
@@ -23,6 +23,7 @@ public class Pelicula {
         this.genero = genero;
         this.imagen = imagen;
         this.director = director;
+        this.actores = actores;
     }
     public void addActor(Actor actor){
         actores.add(actor);

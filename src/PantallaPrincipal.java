@@ -5,7 +5,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.*;
-import java.net.URL;
 import java.util.*;
 import java.util.List;
 
@@ -30,21 +29,21 @@ public class PantallaPrincipal {
     private JLabel peli2;
     private JLabel peli3;
     private JPanel panelPeli1;
-    private JLabel textoPeli2;
-    private JLabel textoPeli3;
-    private JLabel textoPeli4;
-    private JLabel textoPeli1;
+    private JLabel titulo2;
+    private JLabel titulo3;
+    private JLabel titulo4;
+    private JLabel titulo1;
     private JLabel peli5;
-    private JLabel textoPeli5;
+    private JLabel titulo5;
 
     private JLabel peli6;
-    private JLabel textoPeli6;
+    private JLabel titulo6;
     private JLabel peli7;
 
     private JLabel peli8;
-    private JLabel textoPeli8;
+    private JLabel titulo8;
     private JLabel peli9;
-    private JLabel textoPeli9;
+    private JLabel titulo9;
     private JPanel panelPeli2;
     private JPanel panelPeli3;
     private JPanel panelPeli4;
@@ -55,12 +54,17 @@ public class PantallaPrincipal {
     private JPanel panelPeli9;
     private JMenuBar menuBar1;
     private JLabel logo;
+    private JLabel titulo7;
+    private JButton izquierdaCatalogo;
+    private JButton derechaCatalogo;
     private JMenuBar menu;
 
     private int indiceActual = 0;
+    private int indiceActualCatalogo = 0;
     private List<String> listaImagenes;
     private ArrayList<JPanel>panelesPelis;
     private ArrayList<JLabel>imagenes;
+    private ArrayList<JLabel>titulos;
     private ResourceBundle resourceBundle; // Variable para manejar los recursos
     String language;
     private ArrayList<JMenuItem> botonesMenu;
@@ -73,10 +77,18 @@ public class PantallaPrincipal {
     JMenu menuCuenta;
     JMenu menuAjustes;
     JMenu menuAyuda;
+    AdministradorPeliculas admin;
+
+    ArrayList<Pelicula> recomendadas;
+    ArrayList<Pelicula>busqueda;
+
     // Constructor
     public PantallaPrincipal() throws IOException {
 
         menu = new JMenuBar();
+        admin = new AdministradorPeliculas();
+        recomendadas = admin.getRecomendadas(7);
+        busqueda = admin.getPeliculas();
         language = "es";
 
         String userDir = System.getProperty("user.dir");
@@ -86,11 +98,15 @@ public class PantallaPrincipal {
         properties.load(new FileInputStream(path));
         CrearUI();
         eventos();
-        cargarPeliculas();
 
+        mostrarBusqueda();
+        mostrarRecomendadas();
         configuracionMenu = new ConfiguracionMenu(PantallaPrincipal.this);
         pantallaInformacion = new PantallaInformacion(PantallaPrincipal.this);
+
         cambiarIdioma(language);
+
+
 
     }
     private void CrearUI(){
@@ -115,6 +131,17 @@ public class PantallaPrincipal {
         imagenes.add(peli7);
         imagenes.add(peli8);
         imagenes.add(peli9);
+
+        titulos = new ArrayList<>();
+        titulos.add(titulo1);
+        titulos.add(titulo2);
+        titulos.add(titulo3);
+        titulos.add(titulo4);
+        titulos.add(titulo5);
+        titulos.add(titulo6);
+        titulos.add(titulo7);
+        titulos.add(titulo8);
+        titulos.add(titulo9);
 
         // Crear la barra de menú
         menuBar = new JMenuBar();
@@ -149,6 +176,7 @@ public class PantallaPrincipal {
     private void eventos(){
 
         //pulsar en caratula
+
         for(JPanel panel : panelesPelis){
             panel.addMouseListener(new MouseAdapter() {
                 @Override
@@ -156,6 +184,12 @@ public class PantallaPrincipal {
                     super.mouseClicked(e);
                     pantallaInformacion.setVisible(true);
                     pantallaInformacion.refreshUI();
+                    int index =panelesPelis.indexOf(panel);
+                    if(index<3){
+                        pantallaInformacion.cargarPelicula(recomendadas.get(indiceActual%3+ index));
+                    }else{
+                        pantallaInformacion.cargarPelicula(busqueda.get(indiceActualCatalogo%6+ index-3));
+                    }
                     System.out.println("Abrir ventana peli"+panel.getX());
                 }
             });
@@ -165,7 +199,7 @@ public class PantallaPrincipal {
             @Override
             public void actionPerformed(ActionEvent e) {
                 configuracionMenu.setVisible(true);
-                configuracionMenu.initUI();
+
             }
 
         });
@@ -173,9 +207,9 @@ public class PantallaPrincipal {
         botonDerecha.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (!listaImagenes.isEmpty()) {
-                    indiceActual = (indiceActual + 1) % listaImagenes.size();
-                    mostrarImagen();
+                if (!recomendadas.isEmpty()) {
+                    indiceActual = (indiceActual + 1) % recomendadas.size();
+                    mostrarRecomendadas();
                 }
             }
         });
@@ -183,64 +217,76 @@ public class PantallaPrincipal {
         botonIzquierda.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (!listaImagenes.isEmpty()) {
-                    indiceActual = (indiceActual - 1 + listaImagenes.size()) % listaImagenes.size();
-                    mostrarImagen();
+                if (!recomendadas.isEmpty()) {
+                    indiceActual = (indiceActual - 1 + recomendadas.size()) % recomendadas.size();
+                    mostrarRecomendadas();
+                }
+            }
+        });
+        derechaCatalogo.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (!busqueda.isEmpty()) {
+                    indiceActualCatalogo = (indiceActualCatalogo + 1) % busqueda.size();
+                    mostrarBusqueda();
+                }
+            }
+        });
+
+        izquierdaCatalogo.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (!busqueda.isEmpty()) {
+                    indiceActualCatalogo = (indiceActualCatalogo - 1 + listaImagenes.size()) % busqueda.size();
+                    mostrarBusqueda();
                 }
             }
         });
     }
-   private void cargarPeliculas(){
-       // Obtener la lista de nombres de imágenes en la carpeta "imagenes"
-       listaImagenes = obtenerNombresImagenes();
-       if (!listaImagenes.isEmpty()) {
-           mostrarImagen();
-       } else {
-           JOptionPane.showMessageDialog(null, "No hay imágenes en la carpeta 'imagenes'.");
-       }
-   }
 
-    private List<String> obtenerNombresImagenes() {
-        System.out.println("upps");
-        List<String> nombresImagenes = new ArrayList<>();
-        File carpetaImagenes = new File("imagenes");
 
-        if (carpetaImagenes.isDirectory()) {
-            File[] archivos = carpetaImagenes.listFiles();
-            if (archivos != null) {
-                for (File archivo : archivos) {
-                    if (archivo.isFile() && esArchivoImagen(archivo.getName())) {
-                        nombresImagenes.add(archivo.getName());
-                    }
-                }
-            }
-        }
 
-        return nombresImagenes;
-    }
 
     private boolean esArchivoImagen(String nombreArchivo) {
         String extension = nombreArchivo.substring(nombreArchivo.lastIndexOf('.') + 1).toLowerCase();
         return extension.equals("jpg") || extension.equals("png") || extension.equals("gif");
     }
 
-    private ImageIcon escalarImagen(String rutaImagen, int ancho, int alto) {
+    public ImageIcon escalarImagen(String rutaImagen, int ancho, int alto) {
         ImageIcon imagenIcon = new ImageIcon(rutaImagen);
         Image imagen = imagenIcon.getImage().getScaledInstance(ancho, alto, Image.SCALE_SMOOTH);
         return new ImageIcon(imagen);
     }
 
-    private void mostrarImagen() {
-        String rutaImagen = "imagenes/" + listaImagenes.get(indiceActual);
-        System.out.println("Cargando imagen: " + rutaImagen); // Mensaje de depuración
+    private void mostrarRecomendadas() {
+        int aux = indiceActual;
         try {
-            // Escalar la imagen al tamaño deseado
-            ImageIcon imagenIcon = escalarImagen(rutaImagen, 200, 300);
-            peli1.setIcon(imagenIcon);
-        for(int i =1;i< imagenes.size();i++){
-            int siguiente = (indiceActual++) % listaImagenes.size();
-            imagenes.get(i).setIcon(escalarImagen("imagenes/" + listaImagenes.get(siguiente), 200, 300));
+
+            for (int i = 0; i < 3; i++) {
+                String rutaImagen = "BBDD/caratulas/" + recomendadas.get(aux).getImagen();
+                ImageIcon imagenIcon = escalarImagen(rutaImagen, 200, 300);
+                imagenes.get(i).setIcon(imagenIcon);
+                titulos.get(i).setText(recomendadas.get(aux).getTitulo());
+                aux = (aux+1) % recomendadas.size();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Error al cargar la imagen: " + e.getMessage());
         }
+    }
+
+    private void mostrarBusqueda() {
+
+        int aux = indiceActualCatalogo;
+        try {
+            for(int i =3;i< titulos.size();i++){
+                String rutaImagen = "BBDD/caratulas/" + busqueda.get(aux).getImagen();
+                ImageIcon imagenIcon = escalarImagen(rutaImagen, 200, 300);
+                imagenes.get(i).setIcon(imagenIcon);
+                titulos.get(i).setText(busqueda.get(aux).getTitulo());
+                aux = (aux+1) % busqueda.size();
+            }
 
         } catch (Exception e) {
             e.printStackTrace(); // Imprime la traza de la excepción
