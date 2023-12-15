@@ -1,9 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.io.*;
 import java.util.*;
 import java.util.List;
@@ -12,18 +9,17 @@ import java.util.List;
 
 
 public class PantallaPrincipal {
+    private JFrame frame;
     private JPanel panelCabecera2;
-    private JButton botonUsuario;
     private JPanel panelRecomendaciones;
     private JPanel panelCatalogo;
     private JLabel textRecomen;
     private JLabel textCatalogo;
     private JButton botonDerecha;
     private JButton botonIzquierda;
-    private JTextField textField1;
-    private JComboBox<String> comboBox1;
+    private JTextField buscador;
+    private JComboBox<String> filtrosComboBox;
     private JPanel principal;
-    private JPanel panelConPelis;
     private JLabel peli1;
     private JLabel peli4;
     private JLabel peli2;
@@ -57,6 +53,7 @@ public class PantallaPrincipal {
     private JLabel titulo7;
     private JButton izquierdaCatalogo;
     private JButton derechaCatalogo;
+    private JButton botonBuscar;
     private JMenuBar menu;
 
     private int indiceActual = 0;
@@ -82,13 +79,24 @@ public class PantallaPrincipal {
     ArrayList<Pelicula> recomendadas;
     ArrayList<Pelicula>busqueda;
 
-    // Constructor
-    public PantallaPrincipal() throws IOException {
+    ArrayList<Pelicula>peliculasMostradas;
+    ArrayList<String> filtros;
 
+
+    int anchoCaratula =200;
+    int altoCaratula=250;
+    Dimension previousSize;
+
+
+    // Constructor
+    public PantallaPrincipal(JFrame frame) throws IOException {
+        this.frame = frame;
+        previousSize=frame.getSize();
         menu = new JMenuBar();
         admin = new AdministradorPeliculas();
         recomendadas = admin.getRecomendadas(7);
         busqueda = admin.getPeliculas();
+        peliculasMostradas=new ArrayList<>(Collections.nCopies(9, new Pelicula()));
         language = "es";
 
         String userDir = System.getProperty("user.dir");
@@ -99,12 +107,17 @@ public class PantallaPrincipal {
         CrearUI();
         eventos();
 
-        mostrarBusqueda();
-        mostrarRecomendadas();
+        mostrarRecomendadas(anchoCaratula,altoCaratula);
+       mostrarBusqueda(anchoCaratula,altoCaratula);
+
         configuracionMenu = new ConfiguracionMenu(PantallaPrincipal.this);
         pantallaInformacion = new PantallaInformacion(PantallaPrincipal.this);
 
         cambiarIdioma(language);
+
+
+
+
 
 
 
@@ -162,14 +175,32 @@ public class PantallaPrincipal {
         menuAyuda.add(new JMenuItem());
 
         // Agregar el menú a la barra de menú
+        menuBar1 = new JMenuBar();
+
         menuBar1.add(menuPeliculas);
         menuBar1.add(menuBuscar);
         menuBar1.add(menuCuenta);
         menuBar1.add(menuAjustes);
         menuBar1.add(menuAyuda);
 
+
         ImageIcon imagenIcon = escalarImagen("imagenes/logo.png", 60, 60);
         logo.setIcon(imagenIcon);
+        ImageIcon imgDer = new ImageIcon("imagenes/der.png");
+        ImageIcon imgIzq = new ImageIcon("imagenes/izq.png");
+        botonDerecha.setIcon(imgDer);
+        derechaCatalogo.setIcon(imgDer);
+        botonIzquierda.setIcon(imgIzq);
+        izquierdaCatalogo.setIcon(imgIzq);
+
+        filtros = new ArrayList<>();
+        filtros.add("titulo");
+        filtros.add("anio");
+        filtros.add("genero");
+        filtros.add("pais");
+        filtros.add("duracion");
+
+        filtrosComboBox.addItem("hello");
 
     }
 
@@ -186,13 +217,13 @@ public class PantallaPrincipal {
                     pantallaInformacion.refreshUI();
                     int index =panelesPelis.indexOf(panel);
                     if(index<3){
-                        pantallaInformacion.cargarPelicula(recomendadas.get(indiceActual%3+ index));
+                        pantallaInformacion.cargarPelicula(peliculasMostradas.get( index));
                     }else{
-                        pantallaInformacion.cargarPelicula(busqueda.get(indiceActualCatalogo%6+ index-3));
+                        pantallaInformacion.cargarPelicula(peliculasMostradas.get(index));
                     }
-                    System.out.println("Abrir ventana peli"+panel.getX());
                 }
             });
+
         }
         JMenuItem aux=(JMenuItem)    menuAjustes.getMenuComponent(0);
         aux.addActionListener(new ActionListener() {
@@ -209,7 +240,7 @@ public class PantallaPrincipal {
             public void actionPerformed(ActionEvent e) {
                 if (!recomendadas.isEmpty()) {
                     indiceActual = (indiceActual + 1) % recomendadas.size();
-                    mostrarRecomendadas();
+                    mostrarRecomendadas(anchoCaratula,altoCaratula);
                 }
             }
         });
@@ -219,7 +250,7 @@ public class PantallaPrincipal {
             public void actionPerformed(ActionEvent e) {
                 if (!recomendadas.isEmpty()) {
                     indiceActual = (indiceActual - 1 + recomendadas.size()) % recomendadas.size();
-                    mostrarRecomendadas();
+                    mostrarRecomendadas(anchoCaratula,altoCaratula);
                 }
             }
         });
@@ -228,7 +259,7 @@ public class PantallaPrincipal {
             public void actionPerformed(ActionEvent e) {
                 if (!busqueda.isEmpty()) {
                     indiceActualCatalogo = (indiceActualCatalogo + 1) % busqueda.size();
-                    mostrarBusqueda();
+                    mostrarBusqueda(anchoCaratula,altoCaratula);
                 }
             }
         });
@@ -237,13 +268,71 @@ public class PantallaPrincipal {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (!busqueda.isEmpty()) {
-                    indiceActualCatalogo = (indiceActualCatalogo - 1 + listaImagenes.size()) % busqueda.size();
-                    mostrarBusqueda();
+                    indiceActualCatalogo = (indiceActualCatalogo - 1 + busqueda.size()) % busqueda.size();
+                    mostrarBusqueda(anchoCaratula,altoCaratula);
                 }
             }
         });
-    }
+        botonBuscar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(buscador.getText().isEmpty()){
+                    busqueda=admin.getPeliculas();
+                }else{
+                    busqueda = admin.buscarPeliculas(filtros.get(filtrosComboBox.getSelectedIndex()),buscador.getText().toLowerCase());
+                    indiceActualCatalogo=0;
 
+                }
+                if(busqueda.isEmpty()){
+                    UIManager.put("OptionPane.okButtonText", properties.getProperty("aceptar"));
+                    JOptionPane.showMessageDialog(null, properties.getProperty("peliError1"), properties.getProperty("error"), JOptionPane.ERROR_MESSAGE);
+
+
+                }else{
+                    mostrarBusqueda(anchoCaratula,altoCaratula);
+                }
+
+            }
+        });
+        frame.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                // Verifica si el componente es completamente visible
+                if (isSignificantResize(frame.getSize())) {
+                    for (JPanel panel : panelesPelis) {
+
+                        if (!isComponentFullyVisible(panel, frame)) {
+                                panel.setVisible(false);
+                        }else{
+
+                                if(panelesPelis.indexOf(panel)<busqueda.size()+3)panel.setVisible(true);
+
+
+                        }
+                    }
+                     previousSize = frame.getSize();
+                }
+
+            }
+        });
+
+
+    }
+    private  boolean isSignificantResize(Dimension currentSize) {
+        // Define un umbral para el cambio de tamaño significativo
+        int threshold = 10;
+
+        // Compara el cambio de tamaño con el umbral
+        return Math.abs(currentSize.width - previousSize.width) > threshold ||
+                Math.abs(currentSize.height - previousSize.height) > threshold;
+    }
+    private static boolean isComponentFullyVisible(Component component, JFrame frame) {
+        Rectangle componentBounds = component.getBounds();
+        Rectangle screenBounds = new Rectangle(0, 0, frame.getWidth(), frame.getHeight());
+
+        // Verifica si el componente es completamente visible en la pantalla
+        return screenBounds.contains(componentBounds);
+    }
 
 
 
@@ -258,16 +347,20 @@ public class PantallaPrincipal {
         return new ImageIcon(imagen);
     }
 
-    private void mostrarRecomendadas() {
+    public void mostrarRecomendadas(int ancho,int alto) {
+
         int aux = indiceActual;
         try {
 
             for (int i = 0; i < 3; i++) {
+
                 String rutaImagen = "BBDD/caratulas/" + recomendadas.get(aux).getImagen();
-                ImageIcon imagenIcon = escalarImagen(rutaImagen, 200, 300);
+                ImageIcon imagenIcon = escalarImagen(rutaImagen, ancho, alto);
                 imagenes.get(i).setIcon(imagenIcon);
                 titulos.get(i).setText(recomendadas.get(aux).getTitulo());
+                peliculasMostradas.set(i,recomendadas.get(aux));
                 aux = (aux+1) % recomendadas.size();
+
             }
 
         } catch (Exception e) {
@@ -276,16 +369,22 @@ public class PantallaPrincipal {
         }
     }
 
-    private void mostrarBusqueda() {
-
+    public void mostrarBusqueda(int ancho,int alto) {
         int aux = indiceActualCatalogo;
         try {
+
             for(int i =3;i< titulos.size();i++){
+
+                panelesPelis.get(i).setVisible(true);
                 String rutaImagen = "BBDD/caratulas/" + busqueda.get(aux).getImagen();
-                ImageIcon imagenIcon = escalarImagen(rutaImagen, 200, 300);
+                ImageIcon imagenIcon = escalarImagen(rutaImagen, ancho, alto);
                 imagenes.get(i).setIcon(imagenIcon);
                 titulos.get(i).setText(busqueda.get(aux).getTitulo());
+                peliculasMostradas.set(i,busqueda.get(aux));
                 aux = (aux+1) % busqueda.size();
+            }
+            for(int i=busqueda.size()+2;i<8;i++){
+                panelesPelis.get(i).setVisible(false);
             }
 
         } catch (Exception e) {
@@ -304,10 +403,12 @@ public class PantallaPrincipal {
         try (InputStream input = new FileInputStream(path)) {
             properties.load(input);
 
-            textRecomen.setText(properties.getProperty("textRecomen"));
+
+            textRecomen.setText("<html><u>" + properties.getProperty("textRecomen") + "</u></html>");
             textRecomen.setForeground(Color.WHITE);
 
-            textCatalogo.setText(properties.getProperty("textCatalogo"));
+
+            textCatalogo.setText("<html><u>" + properties.getProperty("textCatalogo") + "</u></html>");
             textCatalogo.setForeground(Color.WHITE);
 
             JMenuItem aux;
@@ -334,6 +435,14 @@ public class PantallaPrincipal {
             aux=(JMenuItem)    menuAyuda.getMenuComponent(0);
             aux.setText(properties.getProperty("guia"));
 
+
+
+            filtrosComboBox.removeAllItems();
+            filtrosComboBox.addItem(properties.getProperty("titulo"));
+            filtrosComboBox.addItem(properties.getProperty("anio"));
+            filtrosComboBox.addItem(properties.getProperty("genero"));
+            filtrosComboBox.addItem(properties.getProperty("pais"));
+            filtrosComboBox.addItem(properties.getProperty("duracion"));
             pantallaInformacion.setVisible(false);
 
 
@@ -352,11 +461,12 @@ public class PantallaPrincipal {
 
 
         JFrame frame = new JFrame("FFilms");
-        frame.setSize(1030, 770);
-        PantallaPrincipal pantallaPrincipal = new PantallaPrincipal();
-        frame.setContentPane(pantallaPrincipal.principal);
+        frame.setSize(1500,1000);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
+        PantallaPrincipal pantallaPrincipal = new PantallaPrincipal(frame);
+        frame.setJMenuBar(pantallaPrincipal.menuBar1);
+        frame.setContentPane(pantallaPrincipal.principal);
 
 
 

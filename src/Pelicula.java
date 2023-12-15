@@ -25,6 +25,11 @@ public class Pelicula {
         this.director = director;
         this.actores = actores;
     }
+
+    public Pelicula() {
+
+    }
+
     public void addActor(Actor actor){
         actores.add(actor);
     }

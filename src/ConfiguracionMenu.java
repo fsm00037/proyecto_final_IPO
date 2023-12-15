@@ -59,7 +59,7 @@ public class ConfiguracionMenu extends JFrame {
         // Configuración de la ventana principal
         Properties properties = pantalla.getProperties();
         setTitle(properties.getProperty("ventanaIdioma"));
-        setSize(300, 100);
+        setSize(400, 100);
         setLocationRelativeTo(null);
         aceptarBoton=new JButton(properties.getProperty("aceptar"));
 
