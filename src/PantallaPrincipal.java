@@ -234,6 +234,8 @@ public class PantallaPrincipal {
             @Override
             public void actionPerformed(ActionEvent e) {
                 configuracionMenu.setVisible(true);
+                configuracionMenu.cargarIdiomas();
+
 
             }
 
@@ -473,6 +475,10 @@ public class PantallaPrincipal {
         PantallaPrincipal pantallaPrincipal = new PantallaPrincipal(frame);
         frame.setJMenuBar(pantallaPrincipal.menuBar1);
         frame.setContentPane(pantallaPrincipal.principal);
+
+        ImageIcon icono = new ImageIcon("imagenes/logo.png"); // Ajusta la ruta según tu estructura de carpetas
+
+        frame.setIconImage(icono.getImage());
 
 
 

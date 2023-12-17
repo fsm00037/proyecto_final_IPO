@@ -18,7 +18,8 @@ public class ValoracionesApp extends JFrame {
         setTitle("Valoraciones de Películas");
         setSize(600, 300);
         getContentPane().setBackground(new Color(35, 45, 63)); // #232D3F - Color de fondo de la ventana
-
+        ImageIcon icono = new ImageIcon("imagenes/logo.png"); // Ajusta la ruta según tu estructura de carpetas
+        this.setIconImage(icono.getImage());
         // Inicialización de componentes
         valoracionesListModel = new DefaultListModel<>();
         valoracionesList = new JList<>(valoracionesListModel);

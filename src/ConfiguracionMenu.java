@@ -19,10 +19,13 @@ public class ConfiguracionMenu extends JFrame {
 
     public ConfiguracionMenu(PantallaPrincipal pantalla) {
         this.pantalla = pantalla;
+        idiomaComboBox = new JComboBox<>();
         cargarIdiomas();
+        ImageIcon icono = new ImageIcon("imagenes/logo.png"); // Ajusta la ruta según tu estructura de carpetas
+
+        this.setIconImage(icono.getImage());
 
 
-        idiomaComboBox = new JComboBox<>(new Vector<>(idiomasDisponibles));
         this.setResizable(false);
         initUI();
 
@@ -47,6 +50,8 @@ public class ConfiguracionMenu extends JFrame {
                 System.out.println("La carpeta está vacía o no se puede acceder.");
             }
         }
+        idiomaComboBox.removeAllItems();
+        for(String idioma:idiomasDisponibles) idiomaComboBox.addItem(idioma);
     }
     private void translate(){
         Properties properties = pantalla.getProperties();

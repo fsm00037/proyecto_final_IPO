@@ -46,12 +46,40 @@ public class PantallaInformacion extends JFrame {
         setSize(950, 650);
         setLocationRelativeTo(null);
         this.setResizable(false);
+        ImageIcon icono = new ImageIcon("imagenes/logo.png"); // Ajusta la ruta según tu estructura de carpetas
+        this.setIconImage(icono.getImage());
 
         criticasBoton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 ventanaVal.cargarComentariosIniciales(pelicula.getValoraciones());
             ventanaVal.setVisible(true);
+
+            }
+        });
+        comprarBoton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                UIManager.put("OptionPane.yesButtonText", properties.getProperty("si"));
+                UIManager.put("OptionPane.noButtonText", properties.getProperty("no"));
+                int opcion = JOptionPane.showConfirmDialog(null, properties.getProperty("comprarMsg"), properties.getProperty("comprarPelicula"), JOptionPane.YES_NO_OPTION);
+
+                // Comprobamos la opción seleccionada
+                if (opcion == JOptionPane.YES_OPTION) {
+                    UIManager.put("OptionPane.okButtonText", properties.getProperty("aceptar"));
+                    JOptionPane.showMessageDialog(null, properties.getProperty("compraRealizada"), properties.getProperty("comprarPelicula"), JOptionPane.INFORMATION_MESSAGE);
+                }
+
+
+            }
+        });
+
+
+        trailerBoton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                UIManager.put("OptionPane.okButtonText", properties.getProperty("aceptar"));
+                JOptionPane.showMessageDialog(null, properties.getProperty("peliError2"), properties.getProperty("error"), JOptionPane.ERROR_MESSAGE);
 
             }
         });

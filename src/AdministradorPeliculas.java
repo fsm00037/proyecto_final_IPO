@@ -68,12 +68,10 @@ public class AdministradorPeliculas {
             case "director":
                 return String.valueOf(pelicula.getDirector().getNombre());
             case "actor":
-                return pelicula.getActores().get(0).getNombre()+
-                        pelicula.getActores().get(1).getNombre()+
+                return pelicula.getActores().get(0).getNombre()+" "+
+                        pelicula.getActores().get(1).getNombre()+" "+
                         pelicula.getActores().get(2).getNombre();
 
-            // Agrega más casos según tus atributos
-            // Agrega más casos según tus atributos
         }
         return null;
     }
