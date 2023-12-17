@@ -1,5 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Properties;
 
 public class PantallaInformacion extends JFrame {
@@ -19,23 +21,42 @@ public class PantallaInformacion extends JFrame {
     private JLabel contenidoGenero;
     private JLabel textoDirector;
     private JLabel textoReparto;
-    private JButton button1;
-    private JButton button2;
-    private JButton button3;
+    private JButton trailerBoton;
+    private JButton criticasBoton;
+    private JButton comprarBoton;
+    private JLabel imagenDirector;
+    private JLabel nombreDirector;
+    private JLabel imagenA1;
+    private JLabel nombreA1;
+    private JLabel imagenA2;
+    private JLabel nombreA2;
+    private JLabel imagenA3;
+    private JLabel nombreA3;
 
     private Pelicula pelicula;
     PantallaPrincipal principal;
     Properties properties;
-
+    ValoracionesApp ventanaVal;
     public PantallaInformacion(PantallaPrincipal principal){
         this.principal = principal;
-
+        ventanaVal = new ValoracionesApp();
         refreshUI();
         add(panel1);
 
         setSize(950, 650);
         setLocationRelativeTo(null);
         this.setResizable(false);
+
+        criticasBoton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ventanaVal.cargarComentariosIniciales(pelicula.getValoraciones());
+            ventanaVal.setVisible(true);
+
+            }
+        });
+
+
     }
 
     public void refreshUI() {
@@ -65,6 +86,8 @@ public class PantallaInformacion extends JFrame {
 
         textoReparto.setText("<html><u>" + properties.getProperty("reparto") + "</u></html>");
         textoReparto.setForeground(Color.WHITE);
+
+        ventanaVal.traducir(properties);
     }
 
     public void cargarPelicula(Pelicula peli){
@@ -78,5 +101,26 @@ public class PantallaInformacion extends JFrame {
         String rutaImagen = "BBDD/caratulas/" + peli.getImagen();
         ImageIcon imagenIcon = principal.escalarImagen(rutaImagen, 400, 500);
         imagenPelicula.setIcon(imagenIcon);
+
+        rutaImagen ="BBDD/directores/" + peli.getDirector().getImg();
+        imagenDirector.setIcon(principal.escalarImagen(rutaImagen, 70, 70));
+        nombreDirector.setText(peli.getDirector().nombre);
+        nombreA1.setText(peli.getActores().get(0).nombre);
+        nombreA2.setText(peli.getActores().get(1).nombre);
+        nombreA3.setText(peli.getActores().get(2).nombre);
+        rutaImagen ="BBDD/actores/" + peli.getActores().get(0).getImg();
+        imagenA1.setIcon(principal.escalarImagen(rutaImagen, 70, 70));
+        rutaImagen ="BBDD/actores/" + peli.getActores().get(1).getImg();
+        imagenA2.setIcon(principal.escalarImagen(rutaImagen, 70, 70));
+        rutaImagen ="BBDD/actores/" + peli.getActores().get(2).getImg();
+        imagenA3.setIcon(principal.escalarImagen(rutaImagen, 70, 70));
+
+        rutaImagen ="imagenes/carrito.png";
+        comprarBoton.setIcon(principal.escalarImagen(rutaImagen, 24, 24));
+        rutaImagen ="imagenes/trailer.png";
+        trailerBoton.setIcon(principal.escalarImagen(rutaImagen, 24, 24));
+        rutaImagen ="imagenes/valoracion.png";
+        criticasBoton.setIcon(principal.escalarImagen(rutaImagen, 24, 24));
     }
+
 }

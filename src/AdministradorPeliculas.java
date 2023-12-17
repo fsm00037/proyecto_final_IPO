@@ -1,4 +1,5 @@
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
@@ -7,9 +8,10 @@ public class AdministradorPeliculas {
     private ArrayList<Pelicula> peliculas;
     private ArrayList<Actor> actores;
     private ArrayList<Actor> directores;
+
     private HashMap<String, TreeMap<Object, ArrayList<Pelicula>>> peliculasPorFiltro;
 
-    public AdministradorPeliculas() {
+    public AdministradorPeliculas() throws FileNotFoundException {
         this.peliculas = new ArrayList<>();
         this.actores = new ArrayList<>();
         this.directores = new ArrayList<>();
@@ -18,6 +20,7 @@ public class AdministradorPeliculas {
         cargarActores("BBDD/Actores.tsv");
         cargarDirectores("BBDD/Directores.tsv");
         cargarPeliculas("BBDD/Peliculas2.tsv");
+        addCriticasAPeli("BBDD/Valoraciones.tsv");
 
 
     }
@@ -29,6 +32,8 @@ public class AdministradorPeliculas {
         peliculasPorFiltro.put("genero", new TreeMap<>());
         peliculasPorFiltro.put("pais", new TreeMap<>());
         peliculasPorFiltro.put("duracion", new TreeMap<>());
+        peliculasPorFiltro.put("director", new TreeMap<>());
+        peliculasPorFiltro.put("actor", new TreeMap<>());
         // Agregar más filtros según sea necesario
     }
     // Método para agregar película al árbol
@@ -60,6 +65,12 @@ public class AdministradorPeliculas {
                 return pelicula.getPais().toLowerCase();
             case "duracion":
                 return String.valueOf(pelicula.getDuracion());
+            case "director":
+                return String.valueOf(pelicula.getDirector().getNombre());
+            case "actor":
+                return pelicula.getActores().get(0).getNombre()+
+                        pelicula.getActores().get(1).getNombre()+
+                        pelicula.getActores().get(2).getNombre();
 
             // Agrega más casos según tus atributos
             // Agrega más casos según tus atributos
@@ -138,9 +149,14 @@ public class AdministradorPeliculas {
                     String claveString = ((String) clave).toLowerCase();
                     String valorLower = ((String) valor).toLowerCase();
 
-                    // Split the text into words and check if any of the words match
-                    boolean match = Arrays.stream(claveString.split("\\s+"))
-                            .anyMatch(word -> word.contains(valorLower));
+                    // Split both the key and the value into words
+                    String[] palabrasClave = claveString.split("\\s+");
+                    String[] palabrasValor = valorLower.split("\\s+");
+
+                    // Check if all words in the value match any word in the key
+                    boolean match = Arrays.stream(palabrasValor)
+                            .allMatch(wordValor -> Arrays.stream(palabrasClave)
+                                    .anyMatch(wordClave -> wordClave.equals(wordValor)));
 
                     if (match) {
                         resultado.addAll(entry.getValue());
@@ -154,8 +170,29 @@ public class AdministradorPeliculas {
             return resultado;
         }
 
-
         return new ArrayList<>(); // Devuelve una lista vacía si no se encuentra ninguna película
+    }
+
+    private void addCriticasAPeli(String filePath) throws FileNotFoundException {
+
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            br.readLine();
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] data = line.split("\t");
+
+                int codPelicula = Integer.parseInt(data[0]);
+                String valoracion = data[1];
+
+                // Buscar la película en el ArrayList utilizando el código de la película
+
+                    Pelicula pelicula = peliculas.get(codPelicula-1);
+                    pelicula.addValoracion(valoracion);
+                }
+            } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+
     }
 
     public void cargarDirectores(String ruta) {

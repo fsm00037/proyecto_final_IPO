@@ -9,8 +9,8 @@
 8	Viaje al Pasado	Una fascinante aventura que desafía el tiempo.	2022	140	Estados Unidos	Ciencia Ficción	viaje_pasado.jpg	8	4, 5, 6
 9	Secretos Oscuros	Un misterio oscuro que revela secretos impactantes.	2021	135	Reino Unido	Misterio	secretos_oscuros.jpg	9	7, 8, 16
 10	Risa en Nueva York	Una comedia hilarante ambientada en la Gran Manzana.	2023	110	Estados Unidos	Comedia	risa_nueva_york.jpg	10	9, 10, 11
-11	Odisea Espacial	Una aventura épica que te llevará más allá de las estrellas.	2022	155	Estados Unidos	Aventura	odisea_espacial.jpg	11	12, 13, 14
-12	Enigma en Berlín	Un thriller político que te mantendrá en vilo.	2021	130	Alemania	Suspense	enigma_berlin.jpg	12	15, 16
-13	Magia en el Bosque	Una película fantástica llena de criaturas mágicas.	2023	120	Canadá	Fantasía	magia_bosque.jpg	13	1, 2, 3
-14	Tragedia en Roma	Un drama impactante que se desarrolla en la Ciudad Eterna.	2022	125	Italia	Drama	tragedia_roma.jpg	14	4, 5
-15	Aventuras en el Caribe	Una emocionante historia de piratas y tesoros escondidos.	2023	140	Caribe	Aventura	aventuras_caribe.jpg	15	6, 7, 8
+11	Odisea Espacial	Una aventura épica que te llevará más allá de las estrellas.	2022	155	Estados Unidos	Aventura	odisea_espacial.jpg	3	12, 13, 14
+12	Enigma en Berlín	Un thriller político que te mantendrá en vilo.	2021	130	Alemania	Suspense	enigma_berlin.jpg	2	15, 16, 9
+13	Magia en el Bosque	Una película fantástica llena de criaturas mágicas.	2023	120	Canadá	Fantasía	magia_bosque.jpg	3	1, 2, 3
+14	Tragedia en Roma	Un drama impactante que se desarrolla en la Ciudad Eterna.	2022	125	Italia	Drama	tragedia_roma.jpg	5	4, 5, 10
+15	Aventuras en el Caribe	Una emocionante historia de piratas y tesoros escondidos.	2023	140	Caribe	Aventura	aventuras_caribe.jpg	5	6, 7, 8

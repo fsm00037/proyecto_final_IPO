@@ -188,17 +188,21 @@ public class PantallaPrincipal {
         logo.setIcon(imagenIcon);
         ImageIcon imgDer = new ImageIcon("imagenes/der.png");
         ImageIcon imgIzq = new ImageIcon("imagenes/izq.png");
+        ImageIcon lupaImg = new ImageIcon("imagenes/lupa.png");
         botonDerecha.setIcon(imgDer);
         derechaCatalogo.setIcon(imgDer);
         botonIzquierda.setIcon(imgIzq);
         izquierdaCatalogo.setIcon(imgIzq);
+        botonBuscar.setIcon(lupaImg);
 
         filtros = new ArrayList<>();
         filtros.add("titulo");
         filtros.add("anio");
         filtros.add("genero");
         filtros.add("pais");
-        filtros.add("duracion");
+        //filtros.add("duracion");
+        filtros.add("director");
+        filtros.add("actor");
 
         filtrosComboBox.addItem("hello");
 
@@ -375,7 +379,7 @@ public class PantallaPrincipal {
 
             for(int i =3;i< titulos.size();i++){
 
-                panelesPelis.get(i).setVisible(true);
+                if(isComponentFullyVisible(panelesPelis.get(i),frame))panelesPelis.get(i).setVisible(true);
                 String rutaImagen = "BBDD/caratulas/" + busqueda.get(aux).getImagen();
                 ImageIcon imagenIcon = escalarImagen(rutaImagen, ancho, alto);
                 imagenes.get(i).setIcon(imagenIcon);
@@ -383,7 +387,7 @@ public class PantallaPrincipal {
                 peliculasMostradas.set(i,busqueda.get(aux));
                 aux = (aux+1) % busqueda.size();
             }
-            for(int i=busqueda.size()+2;i<8;i++){
+            for(int i=busqueda.size()+3;i<9;i++){
                 panelesPelis.get(i).setVisible(false);
             }
 
@@ -442,7 +446,9 @@ public class PantallaPrincipal {
             filtrosComboBox.addItem(properties.getProperty("anio"));
             filtrosComboBox.addItem(properties.getProperty("genero"));
             filtrosComboBox.addItem(properties.getProperty("pais"));
-            filtrosComboBox.addItem(properties.getProperty("duracion"));
+           // filtrosComboBox.addItem(properties.getProperty("duracion"));
+            filtrosComboBox.addItem(properties.getProperty("director"));
+            filtrosComboBox.addItem(properties.getProperty("actor"));
             pantallaInformacion.setVisible(false);
 
 

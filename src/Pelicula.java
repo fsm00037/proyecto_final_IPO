@@ -11,6 +11,7 @@ public class Pelicula {
     private String imagen;
     private Actor director;
     private ArrayList<Actor> actores;
+    private ArrayList<String>valoraciones;
 
     public Pelicula(int cod, String titulo, String sinopsis, int anio, int duracion, String pais, String genero, String imagen, Actor director, ArrayList<Actor> actores) {
         this.actores = new ArrayList<>();
@@ -24,10 +25,18 @@ public class Pelicula {
         this.imagen = imagen;
         this.director = director;
         this.actores = actores;
+        this.valoraciones = new ArrayList<>();
+    }
+
+    public ArrayList<String> getValoraciones() {
+        return valoraciones;
     }
 
     public Pelicula() {
 
+    }
+    public void addValoracion(String valoracion){
+        valoraciones.add(valoracion);
     }
 
     public void addActor(Actor actor){
